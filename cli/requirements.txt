@@ -1,0 +1,8 @@
+typer
+certifi
+numpy
+pandas
+requests
+jupyter
+openpyxl
+python-dotenv
