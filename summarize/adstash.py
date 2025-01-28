@@ -256,7 +256,7 @@ def get_transfer_aggregates():
     return agg_query
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def get_transfer_keys_for_bytes_and_files():
     """Get the all file transfer keys for aggregation"""
 
