@@ -6,3 +6,4 @@ requests
 jupyter
 openpyxl
 python-dotenv
+rich

@@ -10,7 +10,7 @@ import requests
 import json
 import logging
 import copy
-from functools import cache
+from functools import lru_cache
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -256,7 +256,7 @@ def get_transfer_aggregates():
     return agg_query
 
 
-@cache
+@lru_cache(maxsize=None)
 def get_transfer_keys_for_bytes_and_files():
     """Get the all file transfer keys for aggregation"""
 
