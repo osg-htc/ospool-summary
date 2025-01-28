@@ -162,7 +162,7 @@ def get_schedd_collector_host_map(update=False):
     if update:
         update_schedd_collector_host_map()
 
-    schedd_collector_host_map_pickle = Path("/Users/clock/PycharmProjects/ospool_summary/data/ospool-host-map.pkl")
+    schedd_collector_host_map_pickle = Path("./data/ospool-host-map.pkl")
     schedd_collector_host_map = {}
     if schedd_collector_host_map_pickle.exists():
         try:
