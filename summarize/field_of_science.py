@@ -196,7 +196,7 @@ class FieldOfScienceMapper:
         # Works fine, lets ignore the warning
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            cip_df = pd.read_excel(SED_CIP_FILE)
+            cip_df = pd.read_excel(SED_CIP_FILE, engine='openpyxl')
 
         # Drop the first two rows and make the third row the column title
         cip_df.columns = cip_df.iloc[2]
