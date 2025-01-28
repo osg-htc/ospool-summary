@@ -17,16 +17,6 @@ Generates the authoritative summary data for the OSPool to be used for OSG repor
 2. Data is pulled from accounting3000
 3. Data is pushed to Elasticsearch on Tiger
 
-# Oddities
-
-Record of things that need context or explanation.
-
-# Things
-
-# What is a OSPool Job?
-
-- A job that is submitted to the OSG
-
 ## Development
 
 ```shell

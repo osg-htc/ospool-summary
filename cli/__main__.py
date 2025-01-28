@@ -2,7 +2,8 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 import logging
-from typing import Annotated, Optional
+from typing import Optional
+from typing_extensions import Annotated
 
 import dotenv
 import typer
