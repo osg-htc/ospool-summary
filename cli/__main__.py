@@ -17,7 +17,7 @@ app = typer.Typer()
 
 
 @app.command()
-def delete(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str | None = None, debug: bool = False, force: bool = False):
+def delete(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False):
     """
     Deletes all documents for a given date or range
     """
@@ -30,7 +30,7 @@ def delete(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] 
 
 
 @app.command()
-def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str | None = None, debug: bool = False, force: bool = False, dry_run: bool = False):
+def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False, dry_run: bool = False):
     """
     Summarizes and pushes the OSPool summary data for a given date
 
@@ -48,7 +48,7 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
 
 
 @app.command()
-def validate(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str | None = None, debug: bool = False):
+def validate(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False):
     """
     Validates the OSPool summary data for a given date based on daily report benchmarks
 
@@ -67,7 +67,7 @@ def validate(date: datetime, end: Annotated[Optional[datetime], typer.Argument()
 
 
 @app.command()
-def report_quality(env_file: str | None = None, debug: bool = False):
+def report_quality(env_file: str = None, debug: bool = False):
     """
     Reports out the number of resources that are left unmapped due to missing resource and project mappings
     """
