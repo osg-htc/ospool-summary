@@ -12,7 +12,7 @@ from summarize.es import index_documents
 from summarize.validate import compare_summary_to_daily
 
 
-def push_summary_date(date: datetime, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, end: datetime = None):
+def push_summary_date(date: datetime, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, not_interactive: bool = False, end: datetime = None):
     """Get yesterday's summary records and index them into Elasticsearch"""
 
     dates_to_validate = [date.date()]
@@ -53,9 +53,13 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
 
             # If not forcing via cli, ask for confirmation if you want to force
             if not force and not dry_run:
-                force = typer.confirm("Index these documents despite warnings?", default=False)
+
+                if not not_interactive:
+                    force = typer.confirm("Index these documents despite warnings?", default=False)
+
                 if force:
                     print(f"[yellow]Force indexing {len(summary_records)} documents on {date}[/yellow]")
+
                 else:
                     raise typer.Exit(code=1)
         else:

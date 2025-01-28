@@ -7,3 +7,4 @@ jupyter
 openpyxl
 python-dotenv
 rich
+typing-extensions
