@@ -87,7 +87,7 @@ def setup_logging(debug: bool = False):
         logging.basicConfig(level=logging.DEBUG)
 
 
-def load_env_file(env_file: str | None, *required_env_vars: str):
+def load_env_file(env_file: str, *required_env_vars: str):
     """Load the environment file and check for the required environment variables"""
 
     # Load the environment file if provided
