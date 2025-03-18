@@ -2,7 +2,7 @@
 
 # OSG Summary Script
 
-Generates the authoritative summary data for the OSPool to be used for OSG reporting and visualizations.
+Generates summary data for the OSPool to be used for OSG reporting and visualizations.
 
 ## Data Sources
 

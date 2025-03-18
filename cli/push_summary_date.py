@@ -35,8 +35,12 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
             raise typer.Exit(code=1)
 
         # Get the start of the day in Central Time
-        start_central_time = datetime.combine(date, datetime.min.time()).replace(tzinfo=pytz.timezone('US/Central'))
-        end_central_time = start_central_time + timedelta(days=1)
+        start_time = datetime.combine(date, datetime.min.time())
+        end_time = start_time + timedelta(days=1)
+
+        # To keep things consistent with the reports convert to central time
+        start_central_time = start_time.astimezone(pytz.timezone('America/Chicago'))
+        end_central_time = end_time.astimezone(pytz.timezone('America/Chicago'))
 
         # Get the summary records
         summary_records = get_summary_records(start=start_central_time, end=end_central_time)
@@ -54,10 +58,8 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
             # If not forcing via cli, ask for confirmation if you want to force
             if not force and not dry_run:
 
-                if not not_interactive:
-                    force = typer.confirm("Index these documents despite warnings?", default=False)
-
-                if force:
+                # If interactive and user opts in
+                if not not_interactive and typer.confirm("Index these documents despite warnings?", default=False):
                     print(f"[yellow]Force indexing {len(summary_records)} documents on {date}[/yellow]")
 
                 else:
