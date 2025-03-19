@@ -2,7 +2,36 @@
 
 # OSG Summary Script
 
-Generates summary data for the OSPool to be used for OSG reporting and visualizations.
+Summarizes data daily for the OSPool to be used for reporting and visualizations.
+
+## Usage
+
+You need env variables set via a `.env` file or in your environment:
+
+```json
+ES_USER
+ES_PASSWORD
+ES_INDEX
+ES_HOST
+```
+
+```shell
+# On accounting3000 or with access to port 9200 on that host
+
+# To summarize data for the day
+python3 -m cli summarize --env-file .env 2025-03-01
+
+# To validate previously generated data
+python3 -m cli validate --env-file .env 2025-03-01
+
+# To delete previously generated data
+python3 -m cli delete --env-file .env 2025-03-01
+
+# All of these commands can be run with a date range
+
+# To summarize a week of data
+python3 -m cli summarize --env-file .env 2025-03-01 2025-03-07
+```
 
 ## Data Sources
 
