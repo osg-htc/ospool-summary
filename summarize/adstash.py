@@ -122,14 +122,20 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
                         }
                     },
                 ],
-                # "must_not": [
-                #     {
-                #         "terms": {
-                #             # Resource must not be in the non-fairshare list
-                #             "ResourceName": list(OSPOOL_NON_FAIRSHARE_RESOURCES)
-                #         }
-                #     },
-                # ],
+                "must_not": [
+                    {
+                        "terms": {
+                            "JobUniverse": JOB_UNIVERSES_TO_SKIP
+                        }
+                    },
+                    # Currently disabled so that this matches with Jason's reports from JobAccounting repo
+                    # {
+                    #     "terms": {
+                    #         # Resource must not be in the non-fairshare list
+                    #         "ResourceName": list(OSPOOL_NON_FAIRSHARE_RESOURCES)
+                    #     }
+                    # },
+                ],
             }
         }
     }
@@ -178,7 +184,7 @@ def get_schedd_collector_host_map(update=False):
 
 
 def update_schedd_collector_host_map():
-    """Update the Schedd to CollectorHost mapping for the OSPool"""
+    """Update the Schedd to CollectorHost mapping for the OSPool - **Not needed if the file is symlinked in**"""
 
     import htcondor
 
@@ -285,34 +291,11 @@ def get_transfer_keys_for_bytes_and_files():
 
     return keys
 
-# def get_transfer_keys_for_bytes_and_files():
-#     """Get the all file transfer keys for aggregation"""
-#
-#     transfer_stats = {
-#         "TransferInputStats",
-#         "TransferOutputStats"
-#     }
-#
-#     transfer_types = {
-#         'Cedar',
-#         'OSDF',
-#         'STASH',
-#         'PELICAN',
-#         'FILE'
-#     }
-#
-#     transfer_mediums = {
-#         'SizeBytesTotal',
-#         'FilesCountTotal'
-#     }
-#
-#     keys = set()
-#     for stat in transfer_stats:
-#         for transfer_type in transfer_types:
-#             for transfer_medium in transfer_mediums:
-#                 keys.add(f"{stat}.{transfer_type}{transfer_medium}")
-#
-#     return keys
+# List of job universes to not count
+JOB_UNIVERSES_TO_SKIP = [
+    7,  # Scheduler Universe
+    12  # Local Universe
+]
 
 # List of OSPool Collectors
 OSPOOL_COLLECTOR = "cm-1.ospool.osg-htc.org"
@@ -389,6 +372,7 @@ def print_flat_response(flat_response):
             s += f"{key.ljust(max(map(lambda x: len(str(x)), flat_response[0].keys())), ' ')}: {sum([v[key] for v in flat_response])}\n"
 
     return s
+
 
 def check_response_failure(response_json):
     """Check the response for failure"""
