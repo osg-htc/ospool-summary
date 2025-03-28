@@ -128,11 +128,6 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
                             "JobUniverse": JOB_UNIVERSES_TO_SKIP
                         }
                     },
-                    {
-                        "terms": {
-                            "JobStatus": JOB_STATUSES_TO_SKIP
-                        }
-                    },
                     # Currently disabled so that this matches with Jason's reports from JobAccounting repo
                     # {
                     #     "terms": {
