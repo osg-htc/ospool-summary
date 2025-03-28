@@ -76,8 +76,7 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
                 index=index,
                 username=username,
                 password=password,
-                force=force,
-                end=end
+                force=force
             )
 
         # Index the summary records
@@ -94,9 +93,11 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
 if __name__ == "__main__":
     """Used for debugging"""
     push_summary_date(
-        date(2024, 1, 1),
+        datetime(2025, 3, 4),
         os.environ['ES_HOST'],
         os.environ['ES_INDEX'],
         os.environ['ES_USER'],
-        os.environ['ES_PASSWORD']
+        os.environ['ES_PASSWORD'],
+        regenerate=True,
+        end=datetime(2025, 3, 18)  # Example end date to test the range (optional
    )
