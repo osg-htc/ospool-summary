@@ -6,13 +6,14 @@ from datetime import date, datetime, timedelta, timezone
 import typer
 from rich import print
 
+from cli.delete_date import delete_date
 from cli.util import get_current_date_count
 from summarize import get_summary_records
 from summarize.es import index_documents
 from summarize.validate import compare_summary_to_daily
 
 
-def push_summary_date(date: datetime, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, not_interactive: bool = False, end: datetime = None):
+def push_summary_date(date: datetime, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False, end: datetime = None):
     """Get yesterday's summary records and index them into Elasticsearch"""
 
     dates_to_validate = [date.date()]
@@ -30,7 +31,7 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
 
         # Check existing summary documents state for the date
         date_document_count = get_current_date_count(date, host, index, username, password)
-        if date_document_count > 0 and not dry_run:
+        if date_document_count > 0 and not dry_run and not regenerate:
             print(f"[bold red]Documents already exist for {date}, please delete before updating[/bold red]")
             raise typer.Exit(code=1)
 
@@ -66,6 +67,18 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
                     raise typer.Exit(code=1)
         else:
             print(f"[green]{pretty_dictionary}[/green]\n")
+
+        # If we are regenerating then we need to delete the days records before indexing them
+        if regenerate:
+            delete_date(
+                date=datetime.combine(date, datetime.min.time()),
+                host=host,
+                index=index,
+                username=username,
+                password=password,
+                force=force,
+                end=end
+            )
 
         # Index the summary records
         if not dry_run:

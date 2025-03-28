@@ -30,7 +30,7 @@ def delete(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] 
 
 
 @app.command()
-def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False, dry_run: bool = False, not_interactive: bool = False):
+def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False):
     """
     Summarizes and pushes the OSPool summary data for a given date
 
@@ -44,7 +44,7 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
     setup_logging(debug)
     load_env_file(env_file, "ES_USER", "ES_PASSWORD", "ES_HOST", "ES_INDEX")
 
-    push_summary_date(date, os.environ['ES_HOST'], os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, end)
+    push_summary_date(date, os.environ['ES_HOST'], os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
 
 
 @app.command()

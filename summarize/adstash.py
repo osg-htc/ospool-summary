@@ -128,6 +128,11 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
                             "JobUniverse": JOB_UNIVERSES_TO_SKIP
                         }
                     },
+                    {
+                        "terms": {
+                            "JobStatus": JOB_STATUSES_TO_SKIP
+                        }
+                    },
                     # Currently disabled so that this matches with Jason's reports from JobAccounting repo
                     # {
                     #     "terms": {
@@ -295,6 +300,11 @@ def get_transfer_keys_for_bytes_and_files():
 JOB_UNIVERSES_TO_SKIP = [
     7,  # Scheduler Universe
     12  # Local Universe
+]
+
+# List of job statuses to not count
+JOB_STATUSES_TO_SKIP = [
+    3,  # Removed
 ]
 
 # List of OSPool Collectors
