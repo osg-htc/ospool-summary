@@ -74,7 +74,12 @@ def get_resource_institution(record: dict):
     # If the record has an institution ID, use that
     if 'InstitutionID' in record and record['InstitutionID'] != "UNKNOWN":
         logger.debug(f"Resource {record['ResourceName']} has an InstitutionID")
-        return get_institution_id_to_metadata_map().get(record['InstitutionID'], None)
+
+        institution = get_institution_id_to_metadata_map().get(record['InstitutionID'], None)
+
+        logger.debug(f"Resource {record['ResourceName']} has InstitutionID {record['InstitutionID']}")
+
+        return institution
 
     # If the record has a resource name, use that
     if record['ResourceName'].lower() in get_resource_to_metadata_map():
@@ -99,3 +104,19 @@ def get_resource_group_to_metadata_map():
     institution_id_to_metadata_map = get_institution_id_to_metadata_map()
 
     return {resource_group.lower(): institution_id_to_metadata_map.get(institution_id, None) for resource_group, institution_id in resource_group_to_institution_id_map.items()}
+
+
+def main():
+    """Used for dev, queries the data for yesterday"""
+
+    monday = datetime.datetime(2025, 4, 27).replace(tzinfo=datetime.timezone(datetime.timedelta(hours=-6)))
+
+    start = monday
+    end = start + datetime.timedelta(days=1)
+
+    summary_records = get_summary_records(start, end)
+
+
+if __name__ == "__main__":
+    """Used for debugging and stepping through outputs"""
+    main()

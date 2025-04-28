@@ -11,6 +11,7 @@ import json
 import logging
 import copy
 from functools import lru_cache
+from collections import defaultdict
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -151,6 +152,7 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
     response_json = response.json()
 
     logger.debug(f"Got {response_json['hits']['total']['value']} records")
+    logger.debug(get_document_bin_counts([*map(lambda x: x['_source'], response_json['hits']['hits'])]))
 
     check_response_failure(response_json)
 
@@ -160,6 +162,26 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
     logger.debug(f"Summary Statistic: {print_flat_response(flat_response)}")
 
     return flat_response
+
+
+def get_document_bin_counts(docs: dict):
+    """Dump all the dict values into a set and return the counts - Useful when numbers don't align"""
+
+    bin_counts = defaultdict(dict)
+    for doc in docs:
+        for key, value in doc.items():
+
+            # If the value is a int, str or bool then toss it in a bin
+            if isinstance(value, (int, str, bool)):
+                bin_counts[key][value] = bin_counts[key].get(value, 0) + 1
+
+    # Run through and remove all the keys that have a count of 1
+    for k0 in bin_counts.keys():
+        for k1 in [*bin_counts[k0].keys()]:
+            if bin_counts[k0][k1] == 1:
+                del bin_counts[k0][k1]
+
+    return json.dumps(bin_counts, indent=2)
 
 
 def get_schedd_collector_host_map(update=False):
@@ -389,7 +411,7 @@ def check_response_failure(response_json):
 def main():
     """Used for dev, queries the data for yesterday"""
 
-    monday = datetime.datetime(2024, 10, 30).replace(tzinfo=datetime.timezone(datetime.timedelta(hours=-6)))
+    monday = datetime.datetime(2025, 4, 27).replace(tzinfo=datetime.timezone(datetime.timedelta(hours=-6)))
 
     start = monday
     end = start + datetime.timedelta(days=1)
