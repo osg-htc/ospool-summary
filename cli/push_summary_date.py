@@ -69,7 +69,7 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
             print(f"[green]{pretty_dictionary}[/green]\n")
 
         # If we are regenerating then we need to delete the days records before indexing them
-        if regenerate:
+        if regenerate and not dry_run:
             delete_date(
                 date=datetime.combine(date, datetime.min.time()),
                 host=host,
