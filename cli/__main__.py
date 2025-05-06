@@ -12,6 +12,7 @@ from cli.delete_date import delete_date as delete_date_cli
 from cli.push_summary_date import push_summary_date
 from cli.report_quality import report_quality as report_quality_cli
 from cli.validate_data import validate_data as validate_data_cli
+from util.send_email import send_email
 
 app = typer.Typer()
 
@@ -30,7 +31,7 @@ def delete(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] 
 
 
 @app.command()
-def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False):
+def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False, send_failure_email: bool = False):
     """
     Summarizes and pushes the OSPool summary data for a given date
 
@@ -44,7 +45,22 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
     setup_logging(debug)
     load_env_file(env_file, "ES_USER", "ES_PASSWORD", "ES_HOST", "ES_INDEX")
 
-    push_summary_date(date, os.environ['ES_HOST'], os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
+    try:
+        push_summary_date(date, os.environ['ES_HOST'], os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
+    except typer.Exit as e:
+
+        # If we are sending an email on failure
+        if send_failure_email:
+
+            # Feels dumb to hardcode but so does spending time to consider
+            send_email(
+                'chtc-cron-mailto@g-groups.wisc.edu',
+                'chtc-cron-mailto@g-groups.wisc.edu',
+                "OSPool Summary Push Failure",
+                f"Push summary date failed for {date} with error: {e}"
+            )
+
+        raise e
 
 
 @app.command()

@@ -16,6 +16,8 @@ from summarize.validate import compare_summary_to_daily
 def push_summary_date(date: datetime, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False, end: datetime = None):
     """Get yesterday's summary records and index them into Elasticsearch"""
 
+    print(f"[yellow]Pushing summary data for {date} with tz {date.tzinfo}[/yellow]")
+
     dates_to_validate = [date.date()]
     if end is not None:
         start_date = min(date.date(), end.date())
@@ -36,14 +38,17 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
             raise typer.Exit(code=1)
 
         # Get the start of the day in Central Time
-        start_time = datetime.combine(date, datetime.min.time())
+        start_time = datetime.combine(date, datetime.min.time()).astimezone(pytz.utc)
         end_time = start_time + timedelta(days=1)
+
+        print(f"[yellow]Getting summary records for times {start_time} to {end_time}[/yellow]")
 
         # To keep things consistent with the reports convert to central time
         start_central_time = start_time.astimezone(pytz.timezone('America/Chicago'))
         end_central_time = end_time.astimezone(pytz.timezone('America/Chicago'))
 
         # Get the summary records
+        print(f"[yellow]Getting summary records for central times {start_central_time} to {end_central_time}[/yellow]")
         summary_records = get_summary_records(start=start_central_time, end=end_central_time)
 
         comparison = compare_summary_to_daily(date, summary_records)
@@ -93,11 +98,9 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
 if __name__ == "__main__":
     """Used for debugging"""
     push_summary_date(
-        datetime(2025, 3, 4),
+        datetime(2025, 5, 5),
         os.environ['ES_HOST'],
         os.environ['ES_INDEX'],
         os.environ['ES_USER'],
-        os.environ['ES_PASSWORD'],
-        regenerate=True,
-        end=datetime(2025, 3, 18)  # Example end date to test the range (optional
+        os.environ['ES_PASSWORD']
    )

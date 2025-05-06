@@ -13,12 +13,11 @@ from email.utils import formatdate
 
 logging = logging.getLogger('chtc_projects_on_ospool')
 
-def send_email(send_from: str, send_to: list, subject: str, text: str, files=None, server=SMTP_SERVER):
-    assert isinstance(send_to, list)
+def send_email(send_from: str, send_to: str | list, subject: str, text: str, files=None, server=SMTP_SERVER):
 
     msg = MIMEMultipart()
     msg['From'] = send_from
-    msg['To'] = ', '.join(send_to)
+    msg['To'] = send_to if isinstance(send_to, str) else ', '.join(send_to)  # Handle the two types
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = subject
 
