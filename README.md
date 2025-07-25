@@ -1,4 +1,3 @@
-![Static Badge](https://img.shields.io/badge/Verified_Constants_On-2024%2F12%2F26-green?style=plastic)
 
 # OSG Summary Script
 
