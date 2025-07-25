@@ -57,7 +57,7 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
         pretty_dictionary = '\n'.join([f"{k}: {v}" for k, v in comparison.items()])
 
         # If we are off by > 5% then we should not push the data
-        if max_diff > 5:
+        if max_diff > .1:
             print(f"[bold red]Data for {date} is off daily reports by {max_diff}%[/bold red]")
             print(f"[bold red]{pretty_dictionary}[/bold red]")
 
