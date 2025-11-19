@@ -12,7 +12,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
-COPY . .
+COPY summarize summarize
+COPY scripts scripts
+COPY cli cli
+COPY data data
+COPY util util
 
 ENTRYPOINT ["bash"]
 CMD ["scripts/summarize_yesterday.sh"]

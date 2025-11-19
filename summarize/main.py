@@ -33,7 +33,7 @@ def get_summary_records(start: datetime.datetime = None, end: datetime.datetime 
     institution_id_to_metadata_map = get_institution_id_to_metadata_map()
     fos_mapper = FieldOfScienceMapper()
 
-    ospool_ad_summary = get_ospool_ad_summary(start=start, end=end)
+    ospool_ad_summary = get_ospool_ad_summary(start=start, end=end, host="https://accounting.chtc.wisc.edu:9200")
 
     summary_records = []
     for summary_record in ospool_ad_summary:

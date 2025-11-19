@@ -1,7 +1,7 @@
 # Summarize Yesterday
 
 ```shell
-docker build -t hub.opensciencegrid.org/opensciencegrid/summarize-yesterday-adstash:latest --file images/summarize_yesterday/Dockerfile .
+docker build --platform linux/amd64 -t hub.opensciencegrid.org/opensciencegrid/summarize-yesterday-adstash:latest --file images/summarize_yesterday/Dockerfile .
 ```
 
 ```shell

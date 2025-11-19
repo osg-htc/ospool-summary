@@ -17,7 +17,7 @@ from collections import defaultdict
 logger = logging.getLogger(__name__)
 
 
-def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
+def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime, host: str = "http://localhost:9200"):
 
     logger.debug(f"Querying from {start.timestamp()} to {end.timestamp()}")
 
@@ -145,7 +145,7 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime):
 
     # Pull out the document and dump it in a dated file
     response = requests.get(
-        f"http://localhost:9200/osg-schedd-*/_search",
+        f"{host}/osg-schedd-*/_search",
         data=json.dumps(query, sort_keys=True, indent=2),
         headers={'Content-Type': 'application/json'}
     )
@@ -247,7 +247,7 @@ def update_schedd_collector_host_map():
             logger.debug(f"Did not find Machine == {schedd} in collectors")
 
     # Update the pickle
-    with open("data/ospool-host-map.pkl", "wb") as f:
+    with open("./data/ospool-host-map.pkl", "wb") as f:
 
         # Report the number of new mappings added
         logger.debug("Added {len(schedd_collector_host_map) - len(original_schedd_collector_host_map)} new Schedd to CollectorHost mappings")
@@ -259,7 +259,7 @@ def get_ospool_aps():
     """Get the list of OSPool Access Points"""
 
     aps = set()
-    ap_collector_host_map = get_schedd_collector_host_map()
+    ap_collector_host_map = get_schedd_collector_host_map(True)
     for ap, collectors in ap_collector_host_map.items():
         if ap.startswith("jupyter-notebook-") or ap.startswith("jupyterlab-"):
             continue
@@ -374,6 +374,7 @@ def flatten_aggregates(aggregates):
             for acct_group in resource["acct_group"]["buckets"]:
 
                 resources.append({
+                    "isNRP": institution_id["key"],
                     "InstitutionID": institution_id["key"],
                     "ResourceName": resource["key"],
                     "AcctGroup": acct_group["key"],
@@ -411,14 +412,16 @@ def check_response_failure(response_json):
 def main():
     """Used for dev, queries the data for yesterday"""
 
-    monday = datetime.datetime(2025, 4, 27).replace(tzinfo=datetime.timezone(datetime.timedelta(hours=-6)))
+    monday = datetime.datetime(2025, 10, 1).replace(tzinfo=datetime.timezone(datetime.timedelta(hours=-6)))
 
     start = monday
-    end = start + datetime.timedelta(days=1)
+    end = start + datetime.timedelta(days=31)
 
-    summary_records = get_ospool_ad_summary(start, end)
+    summary_records = get_ospool_ad_summary(start, end, "http://localhost:9200")
 
 
 if __name__ == "__main__":
     """Used for debugging and stepping through outputs"""
     main()
+
+print("adstash module loaded")
