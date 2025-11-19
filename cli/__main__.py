@@ -46,7 +46,7 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
     load_env_file(env_file, "ES_USER", "ES_PASSWORD", "ES_HOST", "ES_INDEX", "ES_PROVIDER_HOST")
 
     try:
-        push_summary_date(date, os.environ['ES_HOST'], os.environ['ES_PROVIDER_HOST'], os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
+        push_summary_date(date, os.environ['ES_PROVIDER_HOST'], os.environ['ES_HOST'],  os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
     except typer.Exit as e:
 
         # If we are sending an email on failure
