@@ -158,7 +158,7 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime, host
 
     check_response_failure(response_json)
 
-    flat_response = flatten_aggregates(response_json)
+    flat_response = flatten_aggregates(response_json, host)
 
     logger.debug(f"Got {len(flat_response)} records")
     logger.debug(f"Summary Statistic: {print_flat_response(flat_response)}")
@@ -360,10 +360,10 @@ CUSTOM_MAPPING = {
 }
 
 
-def flatten_aggregates(aggregates):
+def flatten_aggregates(aggregates, host):
     """Flatten the nested aggregates"""
 
-    transfer_keys = get_transfer_keys_for_bytes_and_files()
+    transfer_keys = get_transfer_keys_for_bytes_and_files(host)
     file_keys = [key for key in transfer_keys if "FilesCountTotal".casefold() in key.casefold()]
     byte_keys = [key for key in transfer_keys if "SizeBytesTotal".casefold() in key.casefold()]
 
