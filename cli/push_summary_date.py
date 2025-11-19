@@ -69,7 +69,9 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
                     print(f"[yellow]Force indexing {len(summary_records)} documents on {date}[/yellow]")
 
                 else:
-                    raise typer.Exit(code=1)
+                    print(f"[bold red]Aborting indexing documents for {date}[/bold red]")
+                    continue
+
         else:
             print(f"[green]{pretty_dictionary}[/green]\n")
 
@@ -81,7 +83,7 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
                 index=index,
                 username=username,
                 password=password,
-                force=force
+                force=force or not_interactive
             )
 
         # Index the summary records
