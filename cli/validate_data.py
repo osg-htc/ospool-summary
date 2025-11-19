@@ -11,7 +11,7 @@ from summarize.es import index_documents
 from summarize.validate import compare_summary_to_daily, daily_record_mapping, calculate_percent_difference
 
 
-def validate_data(date: datetime, host: str, index: str, username: str, password: str, end: datetime = None):
+def validate_data(date: datetime, provider_host: str, host: str, index: str, username: str, password: str, end: datetime = None):
     """Get yesterday's summary records and index them into Elasticsearch"""
 
     dates_to_validate = [date.date()]
@@ -30,7 +30,7 @@ def validate_data(date: datetime, host: str, index: str, username: str, password
 
         # Check existing summary documents state for the date
         summary_records = get_date_summary_records(date, host, index, username, password)
-        comparison = compare_summary_to_daily(date, summary_records)
+        comparison = compare_summary_to_daily(date, summary_records, provider_host)
         max_diff = max([comparison[x] for x in comparison.keys() if "Vs" in x])
 
         pretty_dictionary = '\n'.join([f"{k}: {v}" for k, v in comparison.items()])

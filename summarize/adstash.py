@@ -12,6 +12,7 @@ import logging
 import copy
 from functools import lru_cache
 from collections import defaultdict
+import os
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime, host
                                             "field": "CoreHr"
                                         }
                                     },
-                                    **get_transfer_aggregates()
+                                    **get_transfer_aggregates(host)
                                 },
                             },
                         }
@@ -147,7 +148,8 @@ def get_ospool_ad_summary(start: datetime.datetime, end: datetime.datetime, host
     response = requests.get(
         f"{host}/osg-schedd-*/_search",
         data=json.dumps(query, sort_keys=True, indent=2),
-        headers={'Content-Type': 'application/json'}
+        headers={'Content-Type': 'application/json'},
+        verify=False
     )
     response_json = response.json()
 
@@ -208,22 +210,22 @@ def get_schedd_collector_host_map(update=False):
 def update_schedd_collector_host_map():
     """Update the Schedd to CollectorHost mapping for the OSPool - **Not needed if the file is symlinked in**"""
 
-    import htcondor
+    import htcondor2
 
     original_schedd_collector_host_map = get_schedd_collector_host_map()
     schedd_collector_host_map = copy.deepcopy(original_schedd_collector_host_map)
 
-    collector = htcondor.Collector(OSPOOL_COLLECTOR)
+    collector = htcondor2.Collector(OSPOOL_COLLECTOR)
 
-    schedds = [ad["Machine"] for ad in collector.locateAll(htcondor.DaemonTypes.Schedd)]
+    schedds = [ad["Machine"] for ad in collector.locateAll(htcondor2.DaemonTypes.Schedd)]
 
     for schedd in schedds:
         schedd_collector_host_map[schedd] = set()
 
         for collector_host in OSPOOL_COLLECTOR_HOSTS:
-            collector = htcondor.Collector(collector_host)
+            collector = htcondor2.Collector(collector_host)
             ads = collector.query(
-                htcondor.AdTypes.Schedd,
+                htcondor2.AdTypes.Schedd,
                 constraint=f'''Machine == "{schedd.split('@')[-1]}"''',
                 projection=["Machine", "CollectorHost"],
             )
@@ -259,7 +261,7 @@ def get_ospool_aps():
     """Get the list of OSPool Access Points"""
 
     aps = set()
-    ap_collector_host_map = get_schedd_collector_host_map(True)
+    ap_collector_host_map = get_schedd_collector_host_map()
     for ap, collectors in ap_collector_host_map.items():
         if ap.startswith("jupyter-notebook-") or ap.startswith("jupyterlab-"):
             continue
@@ -268,10 +270,10 @@ def get_ospool_aps():
     return aps
 
 
-def get_transfer_aggregates():
+def get_transfer_aggregates(host):
     """Create the json for transfer aggregates"""
 
-    keys = get_transfer_keys_for_bytes_and_files()
+    keys = get_transfer_keys_for_bytes_and_files(host)
 
     agg_query = {}
     for key in keys:
@@ -285,14 +287,15 @@ def get_transfer_aggregates():
 
 
 @lru_cache(maxsize=1)
-def get_transfer_keys_for_bytes_and_files():
+def get_transfer_keys_for_bytes_and_files(host):
     """Get the all file transfer keys for aggregation"""
 
     response = requests.get(
-        f"http://localhost:9200/osg-schedd-*/_mapping?pretty",
+        f"{host}/osg-schedd-*/_mapping?pretty",
         headers={
             'Content-Type': 'application/json'
-        }
+        },
+        verify=False
     )
 
     keys = set()

@@ -14,7 +14,7 @@ daily_record_mapping = {
 }
 
 
-def compare_summary_to_daily(date: datetime.date, summary_records: list):
+def compare_summary_to_daily(date: datetime.date, summary_records: list, host: str = "http://localhost:9200") -> dict:
     """Compares the summary records we generated to the canonical daily reports"""
 
     summary_agg_keys = daily_record_mapping.values()
@@ -30,7 +30,7 @@ def compare_summary_to_daily(date: datetime.date, summary_records: list):
         }
     }
 
-    daily_report = requests.get("http://localhost:9200/daily_totals/_search", json=query)
+    daily_report = requests.get(f"{host}/daily_totals/_search", json=query, verify=False)
     daily_report_json = daily_report.json()
     daily_report_list = daily_report_json["hits"]["hits"]
 

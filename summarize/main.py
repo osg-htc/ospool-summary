@@ -16,7 +16,7 @@ from summarize.topology import get_resource_to_institution_id_map, get_acct_grou
 logger = logging.getLogger(__name__)
 
 
-def get_summary_records(start: datetime.datetime = None, end: datetime.datetime = None):
+def get_summary_records(start: datetime.datetime = None, end: datetime.datetime = None, host: str = None):
     """Get the summary records for a single day, defaults to span UTC yesterday"""
 
     # If start is None, set the range to span yesterday
@@ -33,7 +33,7 @@ def get_summary_records(start: datetime.datetime = None, end: datetime.datetime 
     institution_id_to_metadata_map = get_institution_id_to_metadata_map()
     fos_mapper = FieldOfScienceMapper()
 
-    ospool_ad_summary = get_ospool_ad_summary(start=start, end=end, host="https://accounting.chtc.wisc.edu:9200")
+    ospool_ad_summary = get_ospool_ad_summary(start=start, end=end, host=host)
 
     summary_records = []
     for summary_record in ospool_ad_summary:
@@ -62,6 +62,7 @@ def get_summary_records(start: datetime.datetime = None, end: datetime.datetime 
             'OSDFByteTransferCount': summary_record['OSDFByteTransferCount'],
             'FileTransferCount': summary_record['FileTransferCount'],
             'ByteTransferCount': summary_record['ByteTransferCount'],
+            'isNRP': summary_record['isNRP'],
             'Date': str(start.date())
         })
 

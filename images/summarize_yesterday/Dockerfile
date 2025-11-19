@@ -18,5 +18,8 @@ COPY cli cli
 COPY data data
 COPY util util
 
+# Make scripts executable
+RUN chmod +x scripts/*
+
 ENTRYPOINT ["bash"]
 CMD ["scripts/summarize_yesterday.sh"]

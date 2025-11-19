@@ -1,3 +1,4 @@
+rich
 certifi
 numpy
 pandas
@@ -6,3 +7,4 @@ jupyter
 openpyxl
 dotenv
 typer
+htcondor

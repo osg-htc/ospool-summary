@@ -13,7 +13,7 @@ from summarize.es import index_documents
 from summarize.validate import compare_summary_to_daily
 
 
-def push_summary_date(date: datetime, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False, end: datetime = None):
+def push_summary_date(date: datetime, provider_host: str, host: str, index: str, username: str, password: str, force: bool = False, dry_run: bool = False, not_interactive: bool = False, regenerate: bool = False, end: datetime = None):
     """Get yesterday's summary records and index them into Elasticsearch"""
 
     print(f"[yellow]Pushing summary data for {date} with tz {date.tzinfo}[/yellow]")
@@ -49,7 +49,7 @@ def push_summary_date(date: datetime, host: str, index: str, username: str, pass
 
         # Get the summary records
         print(f"[yellow]Getting summary records for central times {start_central_time} to {end_central_time}[/yellow]")
-        summary_records = get_summary_records(start=start_central_time, end=end_central_time)
+        summary_records = get_summary_records(start=start_central_time, end=end_central_time, host=provider_host)
 
         comparison = compare_summary_to_daily(date, summary_records)
         max_diff = max([comparison[x] for x in comparison.keys() if "Vs" in x])
