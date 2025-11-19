@@ -10,10 +10,11 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from typing import Union
 
 logging = logging.getLogger('chtc_projects_on_ospool')
 
-def send_email(send_from: str, send_to: str | list, subject: str, text: str, files=None, server=SMTP_SERVER):
+def send_email(send_from: str, send_to: Union[str, list], subject: str, text: str, files=None, server=SMTP_SERVER):
 
     msg = MIMEMultipart()
     msg['From'] = send_from
