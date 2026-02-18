@@ -13,6 +13,13 @@ daily_record_mapping = {
     "osdf_files_xferd": 'OSDFFileTransferCount'
 }
 
+daily_record_default = {
+    "num_uniq_job_ids": 0,
+    "all_cpu_hours": 0.0,
+    "total_files_xferd": 0,
+    "osdf_files_xferd": 0
+}
+
 
 def compare_summary_to_daily(date: datetime.date, summary_records: list, host: str = "http://localhost:9200") -> dict:
     """Compares the summary records we generated to the canonical daily reports"""
@@ -54,7 +61,12 @@ def compare_summary_to_daily(date: datetime.date, summary_records: list, host: s
             "DailyOSDFFileTransferCount  ": "?",
             "SummaryOSDFFileTransferCount": summary_aggregates["OSDFFileTransferCount"]
         }
-    daily_report = daily_report_list[0]["_source"]
+
+    # Prevent KeyError if any keys are missing in the daily report
+    daily_report = {
+        **daily_record_default,
+        **daily_report_list[0]["_source"]
+    }
 
     # Compare the two dictionaries base on the daily_record_mapping add to csv
     return {

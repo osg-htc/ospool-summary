@@ -1,4 +1,6 @@
 import os
+import sys
+from io import StringIO
 from datetime import datetime, timedelta
 from pathlib import Path
 import logging
@@ -45,22 +47,56 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
     setup_logging(debug)
     load_env_file(env_file, "ES_USER", "ES_PASSWORD", "ES_HOST", "ES_INDEX", "ES_PROVIDER_HOST")
 
+    email_body = f"""
+    Push summary for {date} to {end if end else date}.
+
+    These summaries are the source of information of the OSPool webpages. If they fail the data will not be updated,
+    and the dates will be stuck on the last successful summary push.
+
+    These summaries are completed by the image found at git@github.com:osg-htc/ospool-summary.git/images/summarize_yesterday:latest.
+
+    Everyday we summarize the previous day's data, every weekend we resummarize last years data in case mapped values have changed.
+    """
+
+    # Capture stdout from the push_summary_date function
+    captured_output = StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = captured_output
+
     try:
         push_summary_date(date, os.environ['ES_PROVIDER_HOST'], os.environ['ES_HOST'],  os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
-    except typer.Exit as e:
+
+        # Restore stdout and get captured output
+        sys.stdout = old_stdout
+        output_text = captured_output.getvalue()
+
+        send_email(
+            'chtc-cron-mailto@chtc.io',
+            'chtc-cron-mailto@g-groups.wisc.edu',
+            "✅✅✅✅✅ - OSPool Summary Push Succeeded",
+            email_body + f"\n\nOutput:\n{output_text}",
+        )
+    except Exception as e:
+        # Restore stdout
+        sys.stdout = old_stdout
+        output_text = captured_output.getvalue()
 
         # If we are sending an email on failure
         if send_failure_email:
 
             # Feels dumb to hardcode but so does spending time to consider
             send_email(
+                'chtc-cron-mailto@chtc.io',
                 'chtc-cron-mailto@g-groups.wisc.edu',
-                'chtc-cron-mailto@g-groups.wisc.edu',
-                "OSPool Summary Push Failure",
-                f"Push summary date failed for {date} with error: {e}"
+                "🔥🔥🔥🔥🔥 - OSPool Summary Push Failure",
+                email_body + f"\n\nOutput:\n{output_text}\n\nError details:\n{str(e)}",
             )
 
         raise e
+    finally:
+        # Ensure stdout is always restored
+        sys.stdout = old_stdout
+        captured_output.close()
 
 
 @app.command()

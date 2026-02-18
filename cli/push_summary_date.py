@@ -51,7 +51,7 @@ def push_summary_date(date: datetime, provider_host: str, host: str, index: str,
         print(f"[yellow]Getting summary records for central times {start_central_time} to {end_central_time}[/yellow]")
         summary_records = get_summary_records(start=start_central_time, end=end_central_time, host=provider_host)
 
-        comparison = compare_summary_to_daily(date, summary_records)
+        comparison = compare_summary_to_daily(date, summary_records, provider_host)
         max_diff = max([comparison[x] for x in comparison.keys() if "Vs" in x])
 
         pretty_dictionary = '\n'.join([f"{k}: {v}" for k, v in comparison.items()])

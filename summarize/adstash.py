@@ -200,7 +200,7 @@ def get_schedd_collector_host_map(update=False):
         except IOError:
             pass
     else:
-        logger.debug("No pickle found, just using custom mappings")
+        logger.error("No pickle found, just using custom mappings")
 
     schedd_collector_host_map.update(CUSTOM_MAPPING)
 
@@ -249,7 +249,7 @@ def update_schedd_collector_host_map():
             logger.debug(f"Did not find Machine == {schedd} in collectors")
 
     # Update the pickle
-    with open("./data/ospool-host-map.pkl", "wb") as f:
+    with open("/Users/clock/PycharmProjects/OSPoolSummary/data/ospool-host-map.pkl", "wb") as f:
 
         # Report the number of new mappings added
         logger.debug("Added {len(schedd_collector_host_map) - len(original_schedd_collector_host_map)} new Schedd to CollectorHost mappings")
