@@ -19,6 +19,20 @@ from util.send_email import send_email
 app = typer.Typer()
 
 
+class Tee:
+    """Write to multiple streams simultaneously"""
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, data):
+        for stream in self.streams:
+            stream.write(data)
+
+    def flush(self):
+        for stream in self.streams:
+            stream.flush()
+
+
 @app.command()
 def delete(date: datetime, end: Annotated[Optional[datetime], typer.Argument()] = None, env_file: str = None, debug: bool = False, force: bool = False):
     """
@@ -60,14 +74,11 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
 
     # Capture stdout from the push_summary_date function
     captured_output = StringIO()
-    old_stdout = sys.stdout
-    sys.stdout = captured_output
+    sys.stdout = Tee(sys.stdout, captured_output)
 
     try:
         push_summary_date(date, os.environ['ES_PROVIDER_HOST'], os.environ['ES_HOST'],  os.environ['ES_INDEX'], os.environ['ES_USER'], os.environ['ES_PASSWORD'], force, dry_run, not_interactive, regenerate, end)
 
-        # Restore stdout and get captured output
-        sys.stdout = old_stdout
         output_text = captured_output.getvalue()
 
         send_email(
@@ -77,8 +88,6 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
             email_body + f"\n\nOutput:\n{output_text}",
         )
     except Exception as e:
-        # Restore stdout
-        sys.stdout = old_stdout
         output_text = captured_output.getvalue()
 
         # If we are sending an email on failure
@@ -94,8 +103,6 @@ def summarize(date: datetime, end: Annotated[Optional[datetime], typer.Argument(
 
         raise e
     finally:
-        # Ensure stdout is always restored
-        sys.stdout = old_stdout
         captured_output.close()
 
 

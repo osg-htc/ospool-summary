@@ -426,5 +426,3 @@ def main():
 if __name__ == "__main__":
     """Used for debugging and stepping through outputs"""
     main()
-
-print("adstash module loaded")
