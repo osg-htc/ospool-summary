@@ -8,3 +8,4 @@ openpyxl
 dotenv
 typer
 htcondor
+pytz
